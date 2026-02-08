@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tiny-quiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffe6ef, #fff1f6);
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  width: 100%;
+  max-width: 860px;
+  padding: 46px;
+  border-radius: 32px;
+  box-shadow: 0 25px 55px rgba(255,105,180,0.2);
+  text-align: center;
+  position: relative;
+}
+
+/* Stickers */
+.sticker {
+  position: absolute;
+  opacity: 0.85;
+}
+.s1 { top: -14px; left: -10px; font-size: 30px; }
+.s2 { top: -14px; right: -10px; font-size: 30px; }
+.s3 { bottom: -14px; left: 20px; font-size: 30px; }
+.s4 { bottom: -14px; right: 20px; font-size: 30px; }
+
+.float {
+  animation: floaty 6s ease-in-out infinite;
+  opacity: 0.6;
+}
+.f1 { top: 25%; left: -20px; font-size: 22px; }
+.f2 { top: 60%; right: -18px; font-size: 24px; }
+.f3 { bottom: 25%; left: -16px; font-size: 22px; }
+.f4 { bottom: 55%; right: -20px; font-size: 20px; }
+
+@keyframes floaty {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+h1 { font-size: 28px; margin-bottom: 6px; }
+h2 { font-size: 19px; color: #ff4f9a; margin-bottom: 22px; }
+
+p {
+  font-size: 17px;
+  color: #555;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 18px;
+  border: none;
+  background: #ffe3ed;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #ffd1e2;
+}
+
+.action {
+  display: flex;
+  gap: 18px;
+}
+
+.yes {
+  background: #ff9ac6;
+  color: white;
+  font-weight: 500;
+  transition: box-shadow 0.4s ease;
+}
+
+#feedback {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  min-height: 34px;
+}
+
+#msg {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #ff4f9a;
+  min-height: 60px;
+}
+
+@media (max-width: 600px) {
+  .card { padding: 30px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <!-- Fixed stickers -->
+  <div class="sticker s1">💖</div>
+  <div class="sticker s2">🎬</div>
+  <div class="sticker s3">☕</div>
+  <div class="sticker s4">✨</div>
+
+  <!-- Floating stickers -->
+  <div class="sticker float f1">💕</div>
+  <div class="sticker float f2">✨</div>
+  <div class="sticker float f3">☕</div>
+  <div class="sticker float f4">💫</div>
+
+  <h1>Tiny Quiz...</h1>
+  <h2 id="level">Level 1</h2>
+
+  <div id="content"></div>
+  <div id="feedback"></div>
+  <div id="msg"></div>
+</div>
+
+
+<script>
+ 
+
+const content = document.getElementById("content");
+const feedback = document.getElementById("feedback");
+const msg = document.getElementById("msg");
+const levelTitle = document.getElementById("level");
+
+
+
+
+
+let qIndex = 0;
+let score = 0;
+let locked = false;
+let noRunning = false;
+
+const questions = [
+  {
+    level: "Level 1",
+    q: "In the movie Okkadu, why does Ajay go to Kurnool?",
+    options: [
+      "To save Swapna from Obul Reddy",
+      "To play a Kabaddi tournament",
+      "For a college trip",
+      "To visit Kondareddy Buruju"
+    ],
+    correct: 1
+  },
+  {
+    level: "Level 2",
+    q: "In Srimanthudu, which village does Harsha adopt?",
+    options: ["Ramapuram","Lakshmipuram","Shivalayam","Devarakota"],
+    correct: 3
+  },
+  {
+    level: "Level 3",
+    q: "Which director has worked with Mahesh Babu the MOST times?",
+    options: ["Trivikram","Puri","Srikanth Addala","Koratala Siva"],
+    correct: 0,
+    explain: [
+      "Trivikram: 3 movies, 3000 sarcastic punches.",
+      "Puri: 2 movies, 100% Dhimma Tirige mind blocks.",
+      "Srikanth Addala: Only 2 movies but 2 million smiling cousins.",
+      "Koratala Siva: 2 movies, 20 social messages."
+    ]
+  },
+  {
+    level: "Level 3",
+    q: "What is the unspoken rule of a Mahesh Babu x Trivikram movie?",
+    options: [
+      "50 family members in one house",
+      "Hero has a PhD in sarcasm",
+      "Someone gets slapped for comedy",
+      "All of the above"
+    ],
+    correct: 3
+  },
+  {
+    level: "Level 4 – Trap",
+    q: "In Brahmotsavam, how many family members are on screen during any given song?",
+    options: [
+      "5-10 members",
+      "50+",
+      "Just Mahesh and the heroine",
+      "Exactly 116 relatives"
+    ],
+    correct: [1,3],
+    optionMessages: {
+      0: "This is a trap. Even the background dancers are technically his Chinnanna’s brother-in-law's kids.",
+      3: "Exactly 116 relatives — because that’s the minimum required to fill a frame in a Srikanth Addala movie."
+    }
+  },
+  {
+    level: "Final",
+    q: "What philosophy does Mahesh Babu preach throughout Brahmotsavam?",
+    options: [
+      "Money is everything",
+      "Find which relative did not smile",
+      "Manushulu Mamathalu Anubandhalu..basic ga manushulu antene manchollu ra",
+      "I do not need a map, I have my family"
+    ],
+    correct: 2
+  }
+];
+
+const noVersions = [
+  ["You selected No.","That option has been disabled."],
+  ["Side-character energy detected.","Main-character decisions only.","Try again."],
+  ["No?","Bold.","Incorrect.","Anyway… coffee? ☕"],
+  ["Final stage reached.","No alternate endings.","Choose wisely."],
+  ["Optimistic choice.","Try again."]
+];
+
+function loadQuestion() {
+  feedback.innerText = "";
+  msg.innerText = "";
+  const q = questions[qIndex];
+  levelTitle.innerText = q.level;
+
+  content.innerHTML = `
+    <p>${q.q}</p>
+    ${q.options.map((opt,i)=>`<button onclick="answer(${i})">${opt}</button>`).join("")}
+  `;
+}
+
+function answer(i) {
+  if (locked) return;
+  locked = true;
+
+ 
+
+  const q = questions[qIndex];
+  const isCorrect = Array.isArray(q.correct) ? q.correct.includes(i) : i === q.correct;
+
+  if (q.explain) msg.innerText = q.explain[i];
+  if (q.optionMessages && q.optionMessages[i]) msg.innerText = q.optionMessages[i];
+
+  if (isCorrect) {
+    score++;
+   
+    feedback.innerText = "Correct 😌";
+  } else {
+   
+    feedback.innerText = "Wrong 😬";
+  }
+
+  setTimeout(() => {
+    locked = false;
+    qIndex++;
+    qIndex < questions.length ? loadQuestion() : showAskOut();
+  }, 2200);
+}
+
+function showAskOut() {
+  feedback.innerText = "";
+  msg.innerText = "";
+
+  content.innerHTML = `
+    <p><strong>Respect 😌</strong></p>
+    <p>You passed this test.</p>
+    <p>Feels like we'd vibe.</p>
+    <p><strong>Coffee with me? ☕</strong></p>
+
+    <div class="action">
+      <button class="yes" onclick="yes()">Yes ☕</button>
+      <button onclick="nope()">No</button>
+    </div>
+  `;
+}
+
+function yes() {
+ 
+  content.innerHTML = `
+    <p><strong>Good choice 💖</strong></p>
+    <p>Coffee sounds good ☕</p>
+  `;
+  feedback.innerText = "";
+  msg.innerText = "";
+}
+
+function nope() {
+
+  if (noRunning) return;
+  noRunning = true;
+
+  const version = noVersions[Math.floor(Math.random()*noVersions.length)];
+  const yesBtn = document.querySelector(".yes");
+  msg.innerText = "";
+  yesBtn.style.boxShadow = "none";
+
+  version.forEach((line,i)=>{
+    setTimeout(()=>{
+      msg.innerText = line;
+      if (i === version.length-1) {
+        yesBtn.style.boxShadow = "0 0 26px rgba(255,105,180,0.7)";
+        noRunning = false;
+      }
+    }, i*900);
+  });
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
