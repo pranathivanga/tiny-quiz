@@ -48,8 +48,7 @@ No setup required.
 
 ## 🌐 Live Demo
 
-*(Optional)*  
-If deployed using GitHub Pages, add the link here:
+https://pranathivanga.github.io/tiny-quiz/
 
 
 ---
