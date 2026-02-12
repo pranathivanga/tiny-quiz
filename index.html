@@ -278,7 +278,9 @@ function showAskOut() {
   feedback.innerText = "";
   msg.innerText = "";
 
-  content.innerHTML = `
+  const passed = score >= 4; // change number if you want stricter passing
+
+  content.innerHTML = passed ? `
     <p><strong>Respect 😌</strong></p>
     <p>You passed this test.</p>
     <p>Feels like we'd vibe.</p>
@@ -288,8 +290,19 @@ function showAskOut() {
       <button class="yes" onclick="yes()">Yes ☕</button>
       <button onclick="nope()">No</button>
     </div>
+  ` : `
+    <p><strong>Hmm 🤨</strong></p>
+    <p>You might need a Mahesh Babu crash course.</p>
+    <p>But that can be fixed 😌</p>
+    <p><strong>Coffee first? ☕</strong></p>
+
+    <div class="action">
+      <button class="yes" onclick="yes()">Yes ☕</button>
+      <button onclick="nope()">No</button>
+    </div>
   `;
 }
+
 
 function yes() {
  
